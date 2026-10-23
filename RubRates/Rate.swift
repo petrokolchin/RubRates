@@ -1,7 +1,7 @@
 import Foundation
 
 /// Курс одной валюты к рублю. `value` и `previous` хранятся за одну единицу валюты.
-struct Rate: Equatable, Identifiable {
+nonisolated struct Rate: Equatable, Identifiable {
     let code: String
     let name: String
     let value: Double
@@ -22,7 +22,7 @@ struct Rate: Equatable, Identifiable {
 }
 
 /// Курсы на одну дату.
-struct RatesSnapshot: Equatable {
+nonisolated struct RatesSnapshot: Equatable {
     let date: Date
     let rates: [Rate]
 }

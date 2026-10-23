@@ -1,18 +1,18 @@
 import Foundation
 
 /// Источник курсов. Протокол нужен, чтобы в тестах подменять сеть.
-protocol RatesProviding: Sendable {
+nonisolated protocol RatesProviding: Sendable {
     func fetch() async throws -> RatesSnapshot
 }
 
-enum CBRError: Error, Equatable {
+nonisolated enum CBRError: Error, Equatable {
     case badStatus(Int)
     case invalidResponse
     case missingCurrency(String)
 }
 
 /// Единственное место с сетью: загружает курсы ЦБ РФ и разбирает JSON.
-struct CBRClient: RatesProviding {
+nonisolated struct CBRClient: RatesProviding {
     static let url = URL(string: "https://www.cbr-xml-daily.ru/daily_json.js")!
     static let currencies = ["USD", "CNY", "EUR"]
 
