@@ -8,7 +8,6 @@ struct ContentView: View {
             content
                 .navigationTitle("Курс ЦБ РФ")
         }
-        .task { await viewModel.load() }
     }
 
     @ViewBuilder
@@ -26,14 +25,8 @@ struct ContentView: View {
                 }
             }
             .refreshable { await viewModel.load() }
-        } else if viewModel.refreshFailed {
-            ContentUnavailableView {
-                Label("Не удалось загрузить курсы", systemImage: "wifi.slash")
-            } actions: {
-                Button("Повторить") { Task { await viewModel.load() } }
-            }
         } else {
-            ProgressView()
+            RatesUnavailableView(viewModel: viewModel)
         }
     }
 
@@ -51,7 +44,7 @@ private struct RateRow: View {
             }
             Spacer()
             VStack(alignment: .trailing) {
-                Text(Self.format(rate.value)).font(.title3).monospacedDigit()
+                Text(RuFormat.number(rate.value)).font(.title3).monospacedDigit()
                 changeLabel
             }
         }
@@ -61,58 +54,34 @@ private struct RateRow: View {
     private var changeLabel: some View {
         let rounded = rate.roundedChange
         if rounded == 0 {
-            Text(Self.format(0)).font(.subheadline).foregroundStyle(.secondary)
+            Text(RuFormat.number(0)).font(.subheadline).foregroundStyle(.secondary)
         } else {
             let up = rounded > 0
-            Text("\(up ? "▲" : "▼") \(Self.format(abs(rounded)))")
+            Text("\(up ? "▲" : "▼") \(RuFormat.number(abs(rounded)))")
                 .font(.subheadline)
                 .foregroundStyle(up ? .green : .red)
-                .accessibilityLabel("\(up ? "Выросло" : "Снизилось") на \(Self.format(abs(rounded)))")
+                .accessibilityLabel("\(up ? "Выросло" : "Снизилось") на \(RuFormat.number(abs(rounded)))")
         }
-    }
-
-    private static func format(_ number: Double) -> String {
-        number.formatted(.number.precision(.fractionLength(2)).locale(Locale(identifier: "ru_RU")))
-    }
-}
-
-private struct StaticRatesProvider: RatesProviding {
-    func fetch() async throws -> RatesSnapshot {
-        RatesSnapshot(date: .now, rates: [
-            Rate(code: "USD", name: "Доллар США", value: 81.1255, previous: 81.9739, nominal: 1),
-            Rate(code: "CNY", name: "Китайский юань", value: 12.146, previous: 12.2806, nominal: 1),
-            Rate(code: "EUR", name: "Евро", value: 91.1364, previous: 91.1364, nominal: 1),
-        ])
-    }
-}
-
-private struct FailingRatesProvider: RatesProviding {
-    func fetch() async throws -> RatesSnapshot { throw CBRError.badStatus(503) }
-}
-
-/// Первый запрос успешен, все следующие падают.
-private actor FlakyRatesProvider: RatesProviding {
-    private var calls = 0
-
-    func fetch() async throws -> RatesSnapshot {
-        calls += 1
-        if calls > 1 { throw CBRError.badStatus(503) }
-        return try await StaticRatesProvider().fetch()
     }
 }
 
 #Preview("Курсы") {
-    ContentView(viewModel: RatesViewModel(provider: StaticRatesProvider()))
+    let viewModel = RatesViewModel(provider: StaticRatesProvider())
+    ContentView(viewModel: viewModel)
+        .task { await viewModel.load() }
 }
 
 #Preview("Нет данных, ошибка") {
-    ContentView(viewModel: RatesViewModel(provider: FailingRatesProvider()))
+    let viewModel = RatesViewModel(provider: FailingRatesProvider())
+    ContentView(viewModel: viewModel)
+        .task { await viewModel.load() }
 }
 
 #Preview("Есть данные, обновление не удалось") {
     let viewModel = RatesViewModel(provider: FlakyRatesProvider())
     ContentView(viewModel: viewModel)
         .task {
+            await viewModel.load()
             try? await Task.sleep(for: .seconds(1))
             await viewModel.load()
         }

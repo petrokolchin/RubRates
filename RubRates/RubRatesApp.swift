@@ -7,6 +7,7 @@ struct RubRatesApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(viewModel: viewModel)
+                .task { await viewModel.load() }
         }
     }
 }
