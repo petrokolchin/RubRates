@@ -6,8 +6,19 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		AB911825308B645F008FE15A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB911807308B63F8008FE15A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AB91180E308B63F8008FE15A;
+			remoteInfo = RubRates;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		AB91180F308B63F8008FE15A /* RubRates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RubRates.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB911821308B645F008FE15A /* RubRatesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RubRatesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,20 @@
 			path = RubRates;
 			sourceTree = "<group>";
 		};
+		AB911822308B645F008FE15A /* RubRatesTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RubRatesTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		AB91180C308B63F8008FE15A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		AB91181E308B645F008FE15A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -31,6 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				AB911811308B63F8008FE15A /* RubRates */,
+				AB911822308B645F008FE15A /* RubRatesTests */,
 				AB911810308B63F8008FE15A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				AB91180F308B63F8008FE15A /* RubRates.app */,
+				AB911821308B645F008FE15A /* RubRatesTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -64,6 +87,27 @@
 			productReference = AB91180F308B63F8008FE15A /* RubRates.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AB911820308B645F008FE15A /* RubRatesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB911827308B645F008FE15A /* Build configuration list for PBXNativeTarget "RubRatesTests" */;
+			buildPhases = (
+				AB91181D308B645F008FE15A /* Sources */,
+				AB91181E308B645F008FE15A /* Frameworks */,
+				AB91181F308B645F008FE15A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB911826308B645F008FE15A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AB911822308B645F008FE15A /* RubRatesTests */,
+			);
+			name = RubRatesTests;
+			productName = RubRatesTests;
+			productReference = AB911821308B645F008FE15A /* RubRatesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -76,6 +120,10 @@
 				TargetAttributes = {
 					AB91180E308B63F8008FE15A = {
 						CreatedOnToolsVersion = 27.1;
+					};
+					AB911820308B645F008FE15A = {
+						CreatedOnToolsVersion = 27.1;
+						TestTargetID = AB91180E308B63F8008FE15A;
 					};
 				};
 			};
@@ -94,12 +142,18 @@
 			projectRoot = "";
 			targets = (
 				AB91180E308B63F8008FE15A /* RubRates */,
+				AB911820308B645F008FE15A /* RubRatesTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		AB91180D308B63F8008FE15A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		AB91181F308B645F008FE15A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -112,7 +166,20 @@
 			files = (
 			);
 		};
+		AB91181D308B645F008FE15A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AB911826308B645F008FE15A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AB91180E308B63F8008FE15A /* RubRates */;
+			targetProxy = AB911825308B645F008FE15A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AB911818308B63F9008FE15A /* Debug configuration for PBXProject "RubRates" */ = {
@@ -296,6 +363,46 @@
 			};
 			name = Release;
 		};
+		AB911828308B645F008FE15A /* Debug configuration for PBXNativeTarget "RubRatesTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.RubRatesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RubRates.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RubRates";
+			};
+			name = Debug;
+		};
+		AB911829308B645F008FE15A /* Release configuration for PBXNativeTarget "RubRatesTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.RubRatesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RubRates.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RubRates";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -312,6 +419,14 @@
 			buildConfigurations = (
 				AB91181B308B63F9008FE15A /* Debug configuration for PBXNativeTarget "RubRates" */,
 				AB91181C308B63F9008FE15A /* Release configuration for PBXNativeTarget "RubRates" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		AB911827308B645F008FE15A /* Build configuration list for PBXNativeTarget "RubRatesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB911828308B645F008FE15A /* Debug configuration for PBXNativeTarget "RubRatesTests" */,
+				AB911829308B645F008FE15A /* Release configuration for PBXNativeTarget "RubRatesTests" */,
 			);
 			defaultConfigurationName = Release;
 		};
