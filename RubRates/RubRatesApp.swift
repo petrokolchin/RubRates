@@ -1,17 +1,12 @@
-//
-//  RubRatesApp.swift
-//  RubRates
-//
-//  Created by petro on 23.10.2026.
-//
-
 import SwiftUI
 
 @main
 struct RubRatesApp: App {
+    @State private var viewModel = RatesViewModel(provider: CBRClient())
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(viewModel: viewModel)
         }
     }
 }
