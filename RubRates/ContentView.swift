@@ -59,7 +59,7 @@ private struct RateRow: View {
 
     @ViewBuilder
     private var changeLabel: some View {
-        let rounded = (rate.change * 100).rounded() / 100
+        let rounded = rate.roundedChange
         if rounded == 0 {
             Text(Self.format(0)).font(.subheadline).foregroundStyle(.secondary)
         } else {
@@ -86,6 +86,34 @@ private struct StaticRatesProvider: RatesProviding {
     }
 }
 
-#Preview {
+private struct FailingRatesProvider: RatesProviding {
+    func fetch() async throws -> RatesSnapshot { throw CBRError.badStatus(503) }
+}
+
+/// Первый запрос успешен, все следующие падают.
+private actor FlakyRatesProvider: RatesProviding {
+    private var calls = 0
+
+    func fetch() async throws -> RatesSnapshot {
+        calls += 1
+        if calls > 1 { throw CBRError.badStatus(503) }
+        return try await StaticRatesProvider().fetch()
+    }
+}
+
+#Preview("Курсы") {
     ContentView(viewModel: RatesViewModel(provider: StaticRatesProvider()))
+}
+
+#Preview("Нет данных, ошибка") {
+    ContentView(viewModel: RatesViewModel(provider: FailingRatesProvider()))
+}
+
+#Preview("Есть данные, обновление не удалось") {
+    let viewModel = RatesViewModel(provider: FlakyRatesProvider())
+    ContentView(viewModel: viewModel)
+        .task {
+            try? await Task.sleep(for: .seconds(1))
+            await viewModel.load()
+        }
 }

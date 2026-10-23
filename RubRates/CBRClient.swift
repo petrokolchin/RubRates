@@ -23,7 +23,9 @@ nonisolated struct CBRClient: RatesProviding {
     }
 
     func fetch() async throws -> RatesSnapshot {
-        let (data, response) = try await session.data(from: Self.url)
+        // Сервер разрешает кэшировать ответ на 2 часа; обновление должно ходить в сеть.
+        let request = URLRequest(url: Self.url, cachePolicy: .reloadIgnoringLocalCacheData)
+        let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw CBRError.invalidResponse }
         guard http.statusCode == 200 else { throw CBRError.badStatus(http.statusCode) }
         return try Self.parse(data)

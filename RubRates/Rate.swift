@@ -12,6 +12,9 @@ nonisolated struct Rate: Equatable, Identifiable {
     /// Изменение курса относительно предыдущего дня.
     var change: Double { value - previous }
 
+    /// Изменение, округлённое до копеек: именно оно показывается на экране.
+    var roundedChange: Double { (change * 100).rounded() / 100 }
+
     /// ЦБ отдаёт курс за `nominal` единиц (например, 100 иен), поэтому делим.
     init(code: String, name: String, value: Double, previous: Double, nominal: Int) {
         self.code = code

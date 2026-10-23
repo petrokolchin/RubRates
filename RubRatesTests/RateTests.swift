@@ -24,4 +24,14 @@ struct RateTests {
         let rate = Rate(code: "EUR", name: "Евро", value: 91.1364, previous: 91.1364, nominal: 1)
         #expect(rate.change == 0)
     }
+
+    @Test func roundedChangeIsZeroWhenChangeIsBelowOneKopeck() {
+        let rate = Rate(code: "USD", name: "Доллар США", value: 81.1255, previous: 81.1215, nominal: 1)
+        #expect(rate.roundedChange == 0)
+    }
+
+    @Test func roundedChangeKeepsTwoDecimals() {
+        let rate = Rate(code: "USD", name: "Доллар США", value: 81.1255, previous: 81.9739, nominal: 1)
+        #expect(rate.roundedChange == -0.85)
+    }
 }

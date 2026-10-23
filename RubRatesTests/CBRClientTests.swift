@@ -2,6 +2,7 @@ import Foundation
 import Testing
 @testable import RubRates
 
+@Suite(.serialized)
 struct CBRClientTests {
     @Test func parsesThreeCurrenciesInOrder() throws {
         let snapshot = try CBRClient.parse(Data(SampleResponses.daily.utf8))
@@ -34,6 +35,12 @@ struct CBRClientTests {
         }
     }
 
+    @Test func fetchBypassesLocalCache() async throws {
+        let client = CBRClient(session: StubURLProtocol.session(status: 200, body: Data(SampleResponses.daily.utf8)))
+        _ = try await client.fetch()
+        #expect(StubURLProtocol.lastRequest?.cachePolicy == .reloadIgnoringLocalCacheData)
+    }
+
     @Test func badStatusThrows() async {
         let client = CBRClient(session: StubURLProtocol.session(status: 503, body: Data()))
         await #expect(throws: CBRError.badStatus(503)) {
@@ -46,6 +53,7 @@ struct CBRClientTests {
 final class StubURLProtocol: URLProtocol {
     nonisolated(unsafe) static var status = 200
     nonisolated(unsafe) static var body = Data()
+    nonisolated(unsafe) static var lastRequest: URLRequest?
 
     static func session(status: Int, body: Data) -> URLSession {
         self.status = status
@@ -59,6 +67,7 @@ final class StubURLProtocol: URLProtocol {
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
+        Self.lastRequest = request
         let response = HTTPURLResponse(url: request.url!, statusCode: Self.status, httpVersion: nil, headerFields: nil)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Self.body)
