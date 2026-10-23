@@ -21,7 +21,7 @@ struct ContentView: View {
                 Section {
                     ForEach(snapshot.rates) { RateRow(rate: $0) }
                 } header: {
-                    Text("На \(snapshot.date.formatted(Self.dateStyle))")
+                    Text("На \(snapshot.date.formatted(RuFormat.dateStyle))")
                 }
             }
             .refreshable { await viewModel.load() }
@@ -29,8 +29,6 @@ struct ContentView: View {
             RatesUnavailableView(viewModel: viewModel)
         }
     }
-
-    private static let dateStyle = Date.FormatStyle(date: .long, time: .omitted, locale: Locale(identifier: "ru_RU"))
 }
 
 private struct RateRow: View {
@@ -66,22 +64,17 @@ private struct RateRow: View {
 }
 
 #Preview("Курсы") {
-    let viewModel = RatesViewModel(provider: StaticRatesProvider())
-    ContentView(viewModel: viewModel)
-        .task { await viewModel.load() }
+    RootView(viewModel: RatesViewModel(provider: StaticRatesProvider()))
 }
 
 #Preview("Нет данных, ошибка") {
-    let viewModel = RatesViewModel(provider: FailingRatesProvider())
-    ContentView(viewModel: viewModel)
-        .task { await viewModel.load() }
+    RootView(viewModel: RatesViewModel(provider: FailingRatesProvider()))
 }
 
 #Preview("Есть данные, обновление не удалось") {
     let viewModel = RatesViewModel(provider: FlakyRatesProvider())
-    ContentView(viewModel: viewModel)
+    RootView(viewModel: viewModel)
         .task {
-            await viewModel.load()
             try? await Task.sleep(for: .seconds(1))
             await viewModel.load()
         }
