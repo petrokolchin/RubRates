@@ -44,12 +44,17 @@ struct ConverterView: View {
                     }
                 }
             }
-            .scrollDismissesKeyboard(.interactively)
-            .toolbar {
-                // У цифровой клавиатуры нет Return, а список из нескольких строк не скроллится.
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
+            .scrollDismissesKeyboard(.immediately)
+            .scrollBounceBehavior(.always)
+            // У цифровой клавиатуры нет Return, а клавиатура закрывает панель вкладок.
+            // Кнопка входит в раскладку экрана и поднимается над клавиатурой вместе с её safe area.
+            .safeAreaInset(edge: .bottom) {
+                if amountFocused {
                     Button("Готово") { amountFocused = false }
+                        .buttonStyle(.borderedProminent)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
                 }
             }
         } else {
