@@ -25,8 +25,12 @@ nonisolated struct Conversion: Equatable, Identifiable {
 
 /// Чистая логика конвертера: разбор ввода и пересчёт через рубль.
 nonisolated enum CurrencyConverter {
+    /// Верхняя граница суммы: гарантирует конечные результаты конвертации.
+    static let maxAmount = 1e15
+
     /// Разбирает введённую сумму. Принимает запятую и точку, игнорирует пробелы.
-    /// Всё, что не похоже на обычное неотрицательное число, даёт `nil`.
+    /// Всё, что не похоже на обычное неотрицательное число, даёт `nil`; суммы больше `maxAmount` тоже,
+    /// иначе очень длинный ввод дал бы `inf` в результатах.
     static func parse(_ text: String) -> Double? {
         let compact = text.filter { !$0.isWhitespace }
         let normalized = compact.replacing(",", with: ".")
@@ -34,7 +38,8 @@ nonisolated enum CurrencyConverter {
               normalized.allSatisfy({ $0.isASCIIDigit || $0 == "." }),
               normalized.count(where: { $0 == "." }) <= 1
         else { return nil }
-        return Double(normalized)
+        guard let value = Double(normalized), value <= maxAmount else { return nil }
+        return value
     }
 
     /// Эквиваленты суммы во всех валютах, кроме исходной: сначала рубль, затем курсы по порядку.

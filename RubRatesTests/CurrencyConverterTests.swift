@@ -61,6 +61,15 @@ struct CurrencyConverterTests {
         #expect(CurrencyConverter.parse(text) == expected)
     }
 
+    @Test func hugeDigitStringIsRejected() {
+        #expect(CurrencyConverter.parse(String(repeating: "9", count: 400)) == nil)
+    }
+
+    @Test func amountAboveLimitIsRejected() {
+        #expect(CurrencyConverter.parse("1000000000000000") == 1e15)
+        #expect(CurrencyConverter.parse("1000000000000001") == nil)
+    }
+
     @Test(arguments: ["", "   ", "abc", "1.2.3", "1,2,3", "1.000,5", "-5", "1e5", "inf", "nan", ","])
     func rejectsInvalidInput(text: String) {
         #expect(CurrencyConverter.parse(text) == nil)

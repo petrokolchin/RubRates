@@ -6,6 +6,7 @@ struct ConverterView: View {
 
     @State private var text = ""
     @State private var source: Currency = .rub
+    @FocusState private var amountFocused: Bool
 
     var body: some View {
         NavigationStack {
@@ -22,6 +23,7 @@ struct ConverterView: View {
                     TextField("Сумма", text: $text)
                         .keyboardType(.decimalPad)
                         .font(.title2)
+                        .focused($amountFocused)
                     Picker("Валюта", selection: $source) {
                         Text("₽").tag(Currency.rub)
                         ForEach(snapshot.rates) { Text($0.code).tag(Currency.foreign($0.code)) }
@@ -43,6 +45,13 @@ struct ConverterView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
+            .toolbar {
+                // У цифровой клавиатуры нет Return, а список из нескольких строк не скроллится.
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Готово") { amountFocused = false }
+                }
+            }
         } else {
             RatesUnavailableView(viewModel: viewModel)
         }
