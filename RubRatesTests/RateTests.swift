@@ -34,4 +34,15 @@ struct RateTests {
         let rate = Rate(code: "USD", cbrID: "R01235", name: "Доллар США", value: 81.1255, previous: 81.9739, nominal: 1)
         #expect(rate.roundedChange == -0.85)
     }
+
+    @Test func tinyRateChangeKeepsSignificantDigits() {
+        // 34 и 33 рубля за 10 000 донгов: курс за единицу меньше копейки, но изменение реальное.
+        let rate = Rate(code: "VND", cbrID: "R0", name: "Донг", value: 34, previous: 33, nominal: 10_000)
+        #expect(rate.roundedChange > 0)
+    }
+
+    @Test func smallChangeOfTinyRateIsNotZero() {
+        let rate = Rate(code: "XXX", cbrID: "R0", name: "Тест", value: 0.00500, previous: 0.00499, nominal: 1)
+        #expect(rate.roundedChange != 0)
+    }
 }

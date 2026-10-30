@@ -35,4 +35,26 @@ struct NumberFormatTests {
         #expect(text.contains("11:32"))
         #expect(!text.contains("2026"))
     }
+
+    private func normalized(_ text: String) -> String {
+        plain(text).replacing("\u{2212}", with: "-")
+    }
+
+    @Test func rateUsesTwoDecimalsFromOne() {
+        #expect(normalized(RuFormat.rate(81.1255)) == "81,13")
+        #expect(normalized(RuFormat.rate(12345.6)) == "12 345,60")
+        #expect(RuFormat.rate(0) == "0,00")
+    }
+
+    @Test func rateKeepsSignificantDigitsBelowOne() {
+        #expect(normalized(RuFormat.rate(0.00338)) == "0,00338")
+        #expect(normalized(RuFormat.rate(0.0034012)) == "0,00340")
+    }
+
+    @Test func signedRateHasSign() {
+        #expect(normalized(RuFormat.signedRate(0.00012)) == "+0,000120")
+        #expect(normalized(RuFormat.signedRate(-0.00012)) == "-0,000120")
+        #expect(normalized(RuFormat.signedRate(1.234)) == "+1,23")
+        #expect(RuFormat.signedRate(0) == "0,00")
+    }
 }

@@ -12,6 +12,19 @@ nonisolated enum RuFormat {
             .withExplicitPlus(for: value)
     }
 
+    /// Курс валюты: от 1 два знака после запятой (как `number`), меньше 1 три значащие цифры,
+    /// иначе курс мелкой валюты (например, донга за единицу) превратился бы в «0,00».
+    static func rate(_ value: Double) -> String {
+        guard abs(value) < 1, value != 0 else { return number(value) }
+        return value.formatted(.number.precision(.significantDigits(3)).locale(Locale(identifier: "ru_RU")))
+    }
+
+    /// То же со знаком: «+1,23», «+0,000120», «-0,000120»; ноль без знака.
+    static func signedRate(_ value: Double) -> String {
+        guard abs(value) < 1, value != 0 else { return signedNumber(value) }
+        return rate(value).withExplicitPlus(for: value)
+    }
+
     /// Процент с одним знаком после запятой и знаком: «+1,5%».
     static func signedPercent(_ value: Double) -> String {
         let body = value.formatted(.number.precision(.fractionLength(1)).locale(Locale(identifier: "ru_RU")))
