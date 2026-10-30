@@ -4,6 +4,9 @@ struct ContentView: View {
     let viewModel: RatesViewModel
     let history: HistoryProviding
     let cache: CacheStore
+    let selection: CurrencySelection
+
+    @State private var showingPicker = false
 
     var body: some View {
         NavigationStack {
@@ -27,7 +30,7 @@ struct ContentView: View {
                         .foregroundStyle(.orange)
                 }
                 Section {
-                    ForEach(snapshot.rates) { rate in
+                    ForEach(selection.rates(in: snapshot)) { rate in
                         NavigationLink {
                             RateDetailView(rate: rate, endDate: snapshot.date, provider: history, cache: cache)
                         } label: {
@@ -39,6 +42,14 @@ struct ContentView: View {
                 }
             }
             .refreshable { await viewModel.load() }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Валюты") { showingPicker = true }
+                }
+            }
+            .sheet(isPresented: $showingPicker) {
+                CurrencyPickerView(rates: snapshot.rates, selection: selection)
+            }
         } else {
             RatesUnavailableView(viewModel: viewModel)
         }
@@ -56,7 +67,7 @@ private struct RateRow: View {
             }
             Spacer()
             VStack(alignment: .trailing) {
-                Text(RuFormat.number(rate.value)).font(.title3).monospacedDigit()
+                Text(RuFormat.rate(rate.value)).font(.title3).monospacedDigit()
                 changeLabel
             }
         }
@@ -69,25 +80,25 @@ private struct RateRow: View {
             Text(RuFormat.number(0)).font(.subheadline).foregroundStyle(.secondary)
         } else {
             let up = rounded > 0
-            Text("\(up ? "▲" : "▼") \(RuFormat.number(abs(rounded)))")
+            Text("\(up ? "▲" : "▼") \(RuFormat.rate(abs(rounded)))")
                 .font(.subheadline)
                 .foregroundStyle(up ? .green : .red)
-                .accessibilityLabel("\(up ? "Выросло" : "Снизилось") на \(RuFormat.number(abs(rounded)))")
+                .accessibilityLabel("\(up ? "Выросло" : "Снизилось") на \(RuFormat.rate(abs(rounded)))")
         }
     }
 }
 
 #Preview("Курсы") {
-    RootView(viewModel: RatesViewModel(provider: StaticRatesProvider()), history: StaticHistoryProvider(), cache: MemoryCacheStore())
+    RootView(viewModel: RatesViewModel(provider: StaticRatesProvider()), history: StaticHistoryProvider(), cache: MemoryCacheStore(), selection: .preview())
 }
 
 #Preview("Нет данных, ошибка") {
-    RootView(viewModel: RatesViewModel(provider: FailingRatesProvider()), history: StaticHistoryProvider(), cache: MemoryCacheStore())
+    RootView(viewModel: RatesViewModel(provider: FailingRatesProvider()), history: StaticHistoryProvider(), cache: MemoryCacheStore(), selection: .preview())
 }
 
 #Preview("Есть данные, обновление не удалось") {
     let viewModel = RatesViewModel(provider: FlakyRatesProvider())
-    RootView(viewModel: viewModel, history: StaticHistoryProvider(), cache: MemoryCacheStore())
+    RootView(viewModel: viewModel, history: StaticHistoryProvider(), cache: MemoryCacheStore(), selection: .preview())
         .task {
             try? await Task.sleep(for: .seconds(1))
             await viewModel.load()

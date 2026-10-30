@@ -38,7 +38,7 @@ struct RateDetailView: View {
     private var header: some View {
         VStack(alignment: .leading) {
             Text(rate.name).font(.subheadline).foregroundStyle(.secondary)
-            Text("\(RuFormat.number(rate.value)) ₽").font(.largeTitle).bold().monospacedDigit()
+            Text("\(RuFormat.rate(rate.value)) ₽").font(.largeTitle).bold().monospacedDigit()
         }
     }
 
@@ -79,7 +79,7 @@ struct RateDetailView: View {
                     .annotation(position: .top, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
                         VStack(alignment: .leading) {
                             Text(selected.date.formatted(RuFormat.dateStyle)).font(.caption2).foregroundStyle(.secondary)
-                            Text("\(RuFormat.number(selected.value)) ₽").font(.caption).bold().monospacedDigit()
+                            Text("\(RuFormat.rate(selected.value)) ₽").font(.caption).bold().monospacedDigit()
                         }
                         .padding(6)
                         .background(.background.secondary, in: .rect(cornerRadius: 8))
@@ -116,7 +116,7 @@ struct RateDetailView: View {
             let color: Color = change.absolute > 0 ? .green : (change.absolute < 0 ? .red : .secondary)
             VStack(alignment: .leading) {
                 Text("Изменение за период").font(.caption).foregroundStyle(.secondary)
-                Text("\(RuFormat.signedNumber(change.absolute)) ₽ (\(RuFormat.signedPercent(change.percent)))")
+                Text("\(RuFormat.signedRate(change.absolute)) ₽ (\(RuFormat.signedPercent(change.percent)))")
                     .font(.title3).monospacedDigit().foregroundStyle(color)
             }
         }
