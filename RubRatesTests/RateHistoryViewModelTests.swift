@@ -98,4 +98,109 @@ struct RateHistoryViewModelTests {
         #expect(viewModel.state == .loaded(series))
         #expect(viewModel.change == nil)
     }
+
+    // MARK: кэш
+
+    private let fixedNow = Date(timeIntervalSince1970: 1_792_100_000)
+    private let cachedFetchedAt = Date(timeIntervalSince1970: 1_792_000_000)
+
+    private func makeViewModel(_ provider: FakeHistoryProvider, cache: CacheStore) -> RateHistoryViewModel {
+        RateHistoryViewModel(cbrID: "R01235", endDate: end, provider: provider, cache: cache, now: { fixedNow })
+    }
+
+    private func cacheWith(_ series: [RatePoint], period: HistoryPeriod = .month) -> MemoryCacheStore {
+        let cache = MemoryCacheStore()
+        cache.save(CachedHistory(points: series, fetchedAt: cachedFetchedAt), key: CacheKey.history(cbrID: "R01235", period: period))
+        return cache
+    }
+
+    @Test func cachedSeriesShownBeforeNetwork() async throws {
+        let cached = points([70, 71])
+        let provider = FakeHistoryProvider([(delay: .milliseconds(300), result: .success(points([80, 84])))])
+        let viewModel = makeViewModel(provider, cache: cacheWith(cached))
+        let loading = Task { await viewModel.load() }
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(viewModel.state == .loaded(cached))
+        await loading.value
+    }
+
+    @Test func successReplacesAndWritesCache() async {
+        let fresh = points([80, 84])
+        let cache = cacheWith(points([70, 71]))
+        let viewModel = makeViewModel(FakeHistoryProvider([.success(fresh)]), cache: cache)
+        await viewModel.load()
+        #expect(viewModel.state == .loaded(fresh))
+        #expect(viewModel.cachedAt == nil)
+        let stored = cache.load(CachedHistory.self, key: CacheKey.history(cbrID: "R01235", period: .month))
+        #expect(stored == CachedHistory(points: fresh, fetchedAt: fixedNow))
+    }
+
+    @Test func failureWithCacheKeepsSeries() async {
+        let cached = points([70, 71])
+        let viewModel = makeViewModel(
+            FakeHistoryProvider([.failure(CBRError.badStatus(503))]), cache: cacheWith(cached))
+        await viewModel.load()
+        #expect(viewModel.state == .loaded(cached))
+        #expect(viewModel.cachedAt == cachedFetchedAt)
+    }
+
+    @Test func failureWithoutCacheFails() async {
+        let viewModel = makeViewModel(
+            FakeHistoryProvider([.failure(CBRError.badStatus(503))]), cache: MemoryCacheStore())
+        await viewModel.load()
+        #expect(viewModel.state == .failed)
+        #expect(viewModel.cachedAt == nil)
+    }
+
+    @Test func freshSuccessClearsOfflineNote() async {
+        let fresh = points([80, 84])
+        let viewModel = makeViewModel(
+            FakeHistoryProvider([.failure(CBRError.badStatus(503)), .success(fresh)]),
+            cache: cacheWith(points([70, 71])))
+        await viewModel.load()
+        #expect(viewModel.cachedAt == cachedFetchedAt)
+        await viewModel.load()
+        #expect(viewModel.state == .loaded(fresh))
+        #expect(viewModel.cachedAt == nil)
+    }
+
+    @Test func differentPeriodsUseDifferentKeys() async {
+        let cache = MemoryCacheStore()
+        let viewModel = makeViewModel(FakeHistoryProvider([.success(points([80, 84]))]), cache: cache)
+        viewModel.period = .week
+        await viewModel.load()
+        viewModel.period = .year
+        await viewModel.load()
+        #expect(cache.load(CachedHistory.self, key: CacheKey.history(cbrID: "R01235", period: .week)) != nil)
+        #expect(cache.load(CachedHistory.self, key: CacheKey.history(cbrID: "R01235", period: .year)) != nil)
+        #expect(cache.load(CachedHistory.self, key: CacheKey.history(cbrID: "R01235", period: .month)) == nil)
+    }
+
+    @Test func reloadSamePeriodIsSilent() async throws {
+        let first = points([80, 84])
+        let provider = FakeHistoryProvider([
+            (delay: .zero, result: .success(first)),
+            (delay: .milliseconds(300), result: .success(points([81, 85]))),
+        ])
+        let viewModel = makeViewModel(provider, cache: NullCacheStore())
+        await viewModel.load()
+        let reload = Task { await viewModel.load() }
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(viewModel.state == .loaded(first))
+        await reload.value
+    }
+
+    @Test func periodChangeWithoutCacheShowsLoading() async throws {
+        let provider = FakeHistoryProvider([
+            (delay: .zero, result: .success(points([80, 84]))),
+            (delay: .milliseconds(300), result: .success(points([81, 85]))),
+        ])
+        let viewModel = makeViewModel(provider, cache: MemoryCacheStore())
+        await viewModel.load()
+        viewModel.period = .week
+        let reload = Task { await viewModel.load() }
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(viewModel.state == .loading)
+        await reload.value
+    }
 }
