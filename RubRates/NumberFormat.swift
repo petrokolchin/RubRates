@@ -18,6 +18,15 @@ nonisolated enum RuFormat {
         return body.withExplicitPlus(for: value) + "%"
     }
 
+    /// Время получения данных: «30 окт., 11:32».
+    static func updatedAt(_ date: Date, timeZone: TimeZone = .current) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.timeZone = timeZone
+        formatter.dateFormat = "d MMM, HH:mm"
+        return formatter.string(from: date)
+    }
+
     /// Дата курса: «23 октября 2026 г.».
     static let dateStyle = Date.FormatStyle(date: .long, time: .omitted, locale: Locale(identifier: "ru_RU"))
 }

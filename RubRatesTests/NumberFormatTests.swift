@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import RubRates
 
@@ -21,5 +22,17 @@ struct NumberFormatTests {
     @Test func signedPercentHasOneDecimal() {
         #expect(plain(RuFormat.signedPercent(1.54)).replacing("\u{2212}", with: "-") == "+1,5%")
         #expect(plain(RuFormat.signedPercent(-1.54)).replacing("\u{2212}", with: "-") == "-1,5%")
+    }
+
+    @Test func updatedAtFormat() {
+        let moscow = TimeZone(identifier: "Europe/Moscow")!
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = moscow
+        let date = calendar.date(from: DateComponents(year: 2026, month: 10, day: 30, hour: 11, minute: 32))!
+        let text = RuFormat.updatedAt(date, timeZone: moscow)
+        #expect(text.contains("30"))
+        #expect(text.contains("окт"))
+        #expect(text.contains("11:32"))
+        #expect(!text.contains("2026"))
     }
 }
