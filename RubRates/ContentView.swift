@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     let viewModel: RatesViewModel
+    let history: HistoryProviding
 
     var body: some View {
         NavigationStack {
@@ -19,7 +20,13 @@ struct ContentView: View {
                         .foregroundStyle(.orange)
                 }
                 Section {
-                    ForEach(snapshot.rates) { RateRow(rate: $0) }
+                    ForEach(snapshot.rates) { rate in
+                        NavigationLink {
+                            RateDetailView(rate: rate, endDate: snapshot.date, provider: history)
+                        } label: {
+                            RateRow(rate: rate)
+                        }
+                    }
                 } header: {
                     Text("На \(snapshot.date.formatted(RuFormat.dateStyle))")
                 }
@@ -64,16 +71,16 @@ private struct RateRow: View {
 }
 
 #Preview("Курсы") {
-    RootView(viewModel: RatesViewModel(provider: StaticRatesProvider()))
+    RootView(viewModel: RatesViewModel(provider: StaticRatesProvider()), history: StaticHistoryProvider())
 }
 
 #Preview("Нет данных, ошибка") {
-    RootView(viewModel: RatesViewModel(provider: FailingRatesProvider()))
+    RootView(viewModel: RatesViewModel(provider: FailingRatesProvider()), history: StaticHistoryProvider())
 }
 
 #Preview("Есть данные, обновление не удалось") {
     let viewModel = RatesViewModel(provider: FlakyRatesProvider())
-    RootView(viewModel: viewModel)
+    RootView(viewModel: viewModel, history: StaticHistoryProvider())
         .task {
             try? await Task.sleep(for: .seconds(1))
             await viewModel.load()
