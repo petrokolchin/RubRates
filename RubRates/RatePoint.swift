@@ -1,7 +1,7 @@
 import Foundation
 
 /// Курс за одну единицу валюты на конкретную дату.
-nonisolated struct RatePoint: Equatable, Identifiable {
+nonisolated struct RatePoint: Equatable, Identifiable, Codable {
     let date: Date
     let value: Double
 
