@@ -8,9 +8,9 @@ struct RateDetailView: View {
     @State private var viewModel: RateHistoryViewModel
     @State private var selectedDate: Date?
 
-    init(rate: Rate, endDate: Date, provider: HistoryProviding) {
+    init(rate: Rate, endDate: Date, provider: HistoryProviding, cache: CacheStore) {
         self.rate = rate
-        _viewModel = State(initialValue: RateHistoryViewModel(cbrID: rate.cbrID, endDate: endDate, provider: provider))
+        _viewModel = State(initialValue: RateHistoryViewModel(cbrID: rate.cbrID, endDate: endDate, provider: provider, cache: cache))
     }
 
     var body: some View {
@@ -22,6 +22,7 @@ struct RateDetailView: View {
                 }
                 .pickerStyle(.segmented)
                 chartArea
+                offlineNote
                 changeLabel
             }
             .padding()
@@ -99,6 +100,16 @@ struct RateDetailView: View {
         return points.min { abs($0.date.timeIntervalSince(selectedDate)) < abs($1.date.timeIntervalSince(selectedDate)) }
     }
 
+    /// Подпись под графиком, когда показан сохранённый ряд, а обновить его не удалось.
+    @ViewBuilder
+    private var offlineNote: some View {
+        if let cachedAt = viewModel.cachedAt {
+            Text("Нет связи, показаны сохранённые данные от \(RuFormat.updatedAt(cachedAt))")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+
     @ViewBuilder
     private var changeLabel: some View {
         if let change = viewModel.change {
@@ -116,7 +127,7 @@ struct RateDetailView: View {
     NavigationStack {
         RateDetailView(
             rate: Rate(code: "USD", cbrID: "R01235", name: "Доллар США", value: 81.1255, previous: 81.9739, nominal: 1),
-            endDate: .now, provider: StaticHistoryProvider())
+            endDate: .now, provider: StaticHistoryProvider(), cache: MemoryCacheStore())
     }
 }
 
@@ -124,6 +135,6 @@ struct RateDetailView: View {
     NavigationStack {
         RateDetailView(
             rate: Rate(code: "USD", cbrID: "R01235", name: "Доллар США", value: 81.1255, previous: 81.9739, nominal: 1),
-            endDate: .now, provider: FailingHistoryProvider())
+            endDate: .now, provider: FailingHistoryProvider(), cache: MemoryCacheStore())
     }
 }

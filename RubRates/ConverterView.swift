@@ -40,7 +40,7 @@ struct ConverterView: View {
                             }
                         }
                     } footer: {
-                        Text("По курсу ЦБ на \(snapshot.date.formatted(RuFormat.dateStyle))")
+                        Text("По курсу ЦБ на \(snapshot.date.formatted(RuFormat.dateStyle))\(viewModel.refreshFailed ? ", офлайн" : "")")
                     }
                 }
             }

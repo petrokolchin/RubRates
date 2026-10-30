@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     let viewModel: RatesViewModel
     let history: HistoryProviding
+    let cache: CacheStore
 
     var body: some View {
         NavigationStack {
@@ -11,18 +12,24 @@ struct ContentView: View {
         }
     }
 
+    /// Текст баннера, когда обновить курсы не удалось, а показаны прежние.
+    private var offlineText: String {
+        guard let updated = viewModel.lastUpdated else { return "Не удалось обновить" }
+        return "Нет связи. Курсы сохранены \(RuFormat.updatedAt(updated))"
+    }
+
     @ViewBuilder
     private var content: some View {
         if let snapshot = viewModel.snapshot {
             List {
                 if viewModel.refreshFailed {
-                    Label("Не удалось обновить", systemImage: "exclamationmark.triangle")
+                    Label(offlineText, systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.orange)
                 }
                 Section {
                     ForEach(snapshot.rates) { rate in
                         NavigationLink {
-                            RateDetailView(rate: rate, endDate: snapshot.date, provider: history)
+                            RateDetailView(rate: rate, endDate: snapshot.date, provider: history, cache: cache)
                         } label: {
                             RateRow(rate: rate)
                         }
@@ -71,16 +78,16 @@ private struct RateRow: View {
 }
 
 #Preview("Курсы") {
-    RootView(viewModel: RatesViewModel(provider: StaticRatesProvider()), history: StaticHistoryProvider())
+    RootView(viewModel: RatesViewModel(provider: StaticRatesProvider()), history: StaticHistoryProvider(), cache: MemoryCacheStore())
 }
 
 #Preview("Нет данных, ошибка") {
-    RootView(viewModel: RatesViewModel(provider: FailingRatesProvider()), history: StaticHistoryProvider())
+    RootView(viewModel: RatesViewModel(provider: FailingRatesProvider()), history: StaticHistoryProvider(), cache: MemoryCacheStore())
 }
 
 #Preview("Есть данные, обновление не удалось") {
     let viewModel = RatesViewModel(provider: FlakyRatesProvider())
-    RootView(viewModel: viewModel, history: StaticHistoryProvider())
+    RootView(viewModel: viewModel, history: StaticHistoryProvider(), cache: MemoryCacheStore())
         .task {
             try? await Task.sleep(for: .seconds(1))
             await viewModel.load()
