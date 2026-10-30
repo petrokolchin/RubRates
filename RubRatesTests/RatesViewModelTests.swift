@@ -25,7 +25,7 @@ actor FakeProvider: RatesProviding {
 struct RatesViewModelTests {
     private let snapshot = RatesSnapshot(
         date: Date(timeIntervalSince1970: 0),
-        rates: [Rate(code: "USD", name: "Доллар США", value: 81.1255, previous: 81.9739, nominal: 1)]
+        rates: [Rate(code: "USD", cbrID: "R01235", name: "Доллар США", value: 81.1255, previous: 81.9739, nominal: 1)]
     )
 
     @Test func successSetsSnapshot() async {

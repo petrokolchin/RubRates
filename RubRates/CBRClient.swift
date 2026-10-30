@@ -38,7 +38,7 @@ nonisolated struct CBRClient: RatesProviding {
         }
         let rates = try currencies.map { code in
             guard let v = body.valute[code] else { throw CBRError.missingCurrency(code) }
-            return Rate(code: code, name: v.name, value: v.value, previous: v.previous, nominal: v.nominal)
+            return Rate(code: code, cbrID: v.id, name: v.name, value: v.value, previous: v.previous, nominal: v.nominal)
         }
         return RatesSnapshot(date: date, rates: rates)
     }
@@ -55,12 +55,14 @@ nonisolated struct CBRClient: RatesProviding {
     }
 
     private struct Valute: Decodable {
+        let id: String
         let name: String
         let nominal: Int
         let value: Double
         let previous: Double
 
         enum CodingKeys: String, CodingKey {
+            case id = "ID"
             case name = "Name"
             case nominal = "Nominal"
             case value = "Value"

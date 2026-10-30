@@ -4,7 +4,7 @@ import Testing
 
 struct CurrencyConverterTests {
     private static func rate(_ code: String, _ value: Double) -> Rate {
-        Rate(code: code, name: code, value: value, previous: value, nominal: 1)
+        Rate(code: code, cbrID: "R0", name: code, value: value, previous: value, nominal: 1)
     }
 
     private let rates = [

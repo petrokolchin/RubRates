@@ -2,9 +2,12 @@ import Foundation
 
 /// Образцы ответа `daily_json.js` (значения от 2026-10-23).
 enum SampleResponses {
+    /// ID валют ЦБ, как в настоящем ответе.
+    private static let ids = ["USD": "R01235", "CNY": "R01375", "EUR": "R01239", "JPY": "R01820"]
+
     private static func valute(_ code: String, _ name: String, nominal: Int, value: Double, previous: Double) -> String {
         """
-        "\(code)": {"ID": "R0", "NumCode": "000", "CharCode": "\(code)", "Nominal": \(nominal), \
+        "\(code)": {"ID": "\(ids[code] ?? "R0")", "NumCode": "000", "CharCode": "\(code)", "Nominal": \(nominal), \
         "Name": "\(name)", "Value": \(value), "Previous": \(previous)}
         """
     }

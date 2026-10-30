@@ -11,6 +11,11 @@ struct CBRClientTests {
         #expect(snapshot.rates[0].previous == 81.9739)
     }
 
+    @Test func parsesCbrIDs() throws {
+        let snapshot = try CBRClient.parse(Data(SampleResponses.daily.utf8))
+        #expect(snapshot.rates.map(\.cbrID) == ["R01235", "R01375", "R01239"])
+    }
+
     @Test func parsesDate() throws {
         let snapshot = try CBRClient.parse(Data(SampleResponses.daily.utf8))
         let expected = ISO8601DateFormatter().date(from: "2026-10-23T11:30:00+03:00")
