@@ -116,7 +116,7 @@ struct RateDetailView: View {
             let color: Color = change.absolute > 0 ? .green : (change.absolute < 0 ? .red : .secondary)
             VStack(alignment: .leading) {
                 Text("Изменение за период").font(.caption).foregroundStyle(.secondary)
-                Text("\(RuFormat.signedRate(change.absolute)) ₽ (\(RuFormat.signedPercent(change.percent)))")
+                Text("\(RuFormat.signedRate(change.absolute, like: rate.value)) ₽ (\(RuFormat.signedPercent(change.percent)))")
                     .font(.title3).monospacedDigit().foregroundStyle(color)
             }
         }

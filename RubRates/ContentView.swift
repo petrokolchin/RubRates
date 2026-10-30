@@ -80,10 +80,10 @@ private struct RateRow: View {
             Text(RuFormat.number(0)).font(.subheadline).foregroundStyle(.secondary)
         } else {
             let up = rounded > 0
-            Text("\(up ? "▲" : "▼") \(RuFormat.rate(abs(rounded)))")
+            Text("\(up ? "▲" : "▼") \(RuFormat.rate(abs(rounded), like: rate.value))")
                 .font(.subheadline)
                 .foregroundStyle(up ? .green : .red)
-                .accessibilityLabel("\(up ? "Выросло" : "Снизилось") на \(RuFormat.rate(abs(rounded)))")
+                .accessibilityLabel("\(up ? "Выросло" : "Снизилось") на \(RuFormat.rate(abs(rounded), like: rate.value))")
         }
     }
 }

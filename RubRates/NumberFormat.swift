@@ -25,6 +25,18 @@ nonisolated enum RuFormat {
         return rate(value).withExplicitPlus(for: value)
     }
 
+    /// Величина (например, изменение курса) с точностью, которую задаёт сам курс `reference`:
+    /// курс от 1 даёт два знака («0,19»), меньший курс значимые цифры. Так изменение
+    /// обычной валюты не превращается в «0,190».
+    static func rate(_ value: Double, like reference: Double) -> String {
+        abs(reference) >= 1 ? number(value) : rate(value)
+    }
+
+    /// То же со знаком.
+    static func signedRate(_ value: Double, like reference: Double) -> String {
+        abs(reference) >= 1 ? signedNumber(value) : signedRate(value)
+    }
+
     /// Процент с одним знаком после запятой и знаком: «+1,5%».
     static func signedPercent(_ value: Double) -> String {
         let body = value.formatted(.number.precision(.fractionLength(1)).locale(Locale(identifier: "ru_RU")))

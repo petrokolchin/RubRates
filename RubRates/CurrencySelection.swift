@@ -7,8 +7,8 @@ import SwiftUI
 @MainActor
 @Observable
 final class CurrencySelection {
-    static let defaultCodes = ["USD", "CNY", "EUR"]
-    static let storageKey = "selectedCurrencyCodes"
+    nonisolated static let defaultCodes = ["USD", "CNY", "EUR"]
+    nonisolated static let storageKey = "selectedCurrencyCodes"
 
     private(set) var codes: [String]
 

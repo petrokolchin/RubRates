@@ -57,4 +57,14 @@ struct NumberFormatTests {
         #expect(normalized(RuFormat.signedRate(1.234)) == "+1,23")
         #expect(RuFormat.signedRate(0) == "0,00")
     }
+
+    @Test func changeFollowsRatePrecision() {
+        // У обычной валюты изменение в два знака, а не «0,190».
+        #expect(normalized(RuFormat.rate(0.19, like: 80.68)) == "0,19")
+        #expect(normalized(RuFormat.signedRate(0.45, like: 80)) == "+0,45")
+        #expect(normalized(RuFormat.signedRate(-0.45, like: 80)) == "-0,45")
+        // У мелкой валюты значимые цифры.
+        #expect(normalized(RuFormat.rate(0.00000902, like: 0.00315)) == "0,00000902")
+        #expect(normalized(RuFormat.signedRate(-0.00012, like: 0.003)) == "-0,000120")
+    }
 }
