@@ -65,8 +65,6 @@ struct RateDetailView: View {
     private func chart(_ points: [RatePoint]) -> some View {
         let values = points.map(\.value)
         let low = values.min()!, high = values.max()!
-        // Ось Y по диапазону данных, а не от нуля, иначе линия выглядит плоской.
-        let pad = max((high - low) * 0.1, 0.5)
         let selected = selectedPoint(in: points)
         return Chart {
             ForEach(points) { point in
@@ -87,7 +85,7 @@ struct RateDetailView: View {
                 PointMark(x: .value("Дата", selected.date), y: .value("Курс", selected.value))
             }
         }
-        .chartYScale(domain: (low - pad)...(high + pad))
+        .chartYScale(domain: ChartScale.yDomain(low: low, high: high))
         .chartXSelection(value: $selectedDate)
         // Подписи оси дат (месяцы) по-русски, как и остальной интерфейс.
         .environment(\.locale, Locale(identifier: "ru_RU"))
