@@ -14,7 +14,6 @@ nonisolated enum CBRError: Error, Equatable {
 /// Единственное место с сетью: загружает курсы ЦБ РФ и разбирает JSON.
 nonisolated struct CBRClient: RatesProviding {
     static let url = URL(string: "https://www.cbr-xml-daily.ru/daily_json.js")!
-    static let currencies = ["USD", "CNY", "EUR"]
 
     private let session: URLSession
 
@@ -36,9 +35,10 @@ nonisolated struct CBRClient: RatesProviding {
         guard let date = ISO8601DateFormatter().date(from: body.date) else {
             throw CBRError.invalidResponse
         }
-        let rates = try currencies.map { code in
-            guard let v = body.valute[code] else { throw CBRError.missingCurrency(code) }
-            return Rate(code: code, cbrID: v.id, name: v.name, value: v.value, previous: v.previous, nominal: v.nominal)
+        guard !body.valute.isEmpty else { throw CBRError.invalidResponse }
+        // Порядок ключей JSON декодер не гарантирует, поэтому сортируем по коду: порядок стабилен.
+        let rates = body.valute.sorted { $0.key < $1.key }.map { code, v in
+            Rate(code: code, cbrID: v.id, name: v.name, value: v.value, previous: v.previous, nominal: v.nominal)
         }
         return RatesSnapshot(date: date, rates: rates)
     }

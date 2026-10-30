@@ -4,16 +4,17 @@ import Testing
 
 @Suite(.serialized)
 struct CBRClientTests {
-    @Test func parsesThreeCurrenciesInOrder() throws {
+    @Test func parsesAllCurrenciesSortedByCode() throws {
         let snapshot = try CBRClient.parse(Data(SampleResponses.daily.utf8))
-        #expect(snapshot.rates.map(\.code) == ["USD", "CNY", "EUR"])
-        #expect(snapshot.rates[0].value == 81.1255)
-        #expect(snapshot.rates[0].previous == 81.9739)
+        #expect(snapshot.rates.map(\.code) == ["CNY", "EUR", "JPY", "USD"])
+        let usd = try #require(snapshot.rates.first { $0.code == "USD" })
+        #expect(usd.value == 81.1255)
+        #expect(usd.previous == 81.9739)
     }
 
     @Test func parsesCbrIDs() throws {
         let snapshot = try CBRClient.parse(Data(SampleResponses.daily.utf8))
-        #expect(snapshot.rates.map(\.cbrID) == ["R01235", "R01375", "R01239"])
+        #expect(snapshot.rates.map(\.cbrID) == ["R01375", "R01239", "R01820", "R01235"])
     }
 
     @Test func parsesDate() throws {
@@ -28,9 +29,15 @@ struct CBRClientTests {
         #expect(abs(cny.value - 12.146) < 0.0001)
     }
 
-    @Test func missingCurrencyThrows() {
-        #expect(throws: CBRError.missingCurrency("CNY")) {
-            try CBRClient.parse(Data(SampleResponses.withoutCNY.utf8))
+    @Test func dividesJPYNominal() throws {
+        let snapshot = try CBRClient.parse(Data(SampleResponses.daily.utf8))
+        let jpy = try #require(snapshot.rates.first { $0.code == "JPY" })
+        #expect(abs(jpy.value - 0.534) < 0.0001)
+    }
+
+    @Test func emptyValutesThrows() {
+        #expect(throws: CBRError.invalidResponse) {
+            try CBRClient.parse(Data(SampleResponses.emptyValutes.utf8))
         }
     }
 

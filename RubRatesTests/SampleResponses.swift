@@ -35,5 +35,5 @@ enum SampleResponses {
         eur,
     ])
 
-    static let withoutCNY = response([usd, eur])
+    static let emptyValutes = response([])
 }
