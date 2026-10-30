@@ -74,4 +74,9 @@ struct CurrencyConverterTests {
     func rejectsInvalidInput(text: String) {
         #expect(CurrencyConverter.parse(text) == nil)
     }
+
+    @Test func segmentedPickerLimit() {
+        #expect(CurrencyConverter.usesSegmentedPicker(optionCount: 4) == true)
+        #expect(CurrencyConverter.usesSegmentedPicker(optionCount: 5) == false)
+    }
 }

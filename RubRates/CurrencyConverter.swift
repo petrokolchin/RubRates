@@ -25,6 +25,11 @@ nonisolated struct Conversion: Equatable, Identifiable {
 
 /// Чистая логика конвертера: разбор ввода и пересчёт через рубль.
 nonisolated enum CurrencyConverter {
+    /// Сегментный переключатель умещается примерно до четырёх вариантов, дальше нужно меню.
+    static func usesSegmentedPicker(optionCount: Int) -> Bool {
+        optionCount <= 4
+    }
+
     /// Верхняя граница суммы: гарантирует конечные результаты конвертации.
     static let maxAmount = 1e15
 
