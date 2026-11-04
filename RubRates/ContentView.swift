@@ -68,22 +68,8 @@ private struct RateRow: View {
             Spacer()
             VStack(alignment: .trailing) {
                 Text(RuFormat.rate(rate.value)).font(.title3).monospacedDigit()
-                changeLabel
+                RateChangeLabel(rate: rate)
             }
-        }
-    }
-
-    @ViewBuilder
-    private var changeLabel: some View {
-        let rounded = rate.roundedChange
-        if rounded == 0 {
-            Text(RuFormat.number(0)).font(.subheadline).foregroundStyle(.secondary)
-        } else {
-            let up = rounded > 0
-            Text("\(up ? "▲" : "▼") \(RuFormat.rate(abs(rounded), like: rate.value))")
-                .font(.subheadline)
-                .foregroundStyle(up ? .green : .red)
-                .accessibilityLabel("\(up ? "Выросло" : "Снизилось") на \(RuFormat.rate(abs(rounded), like: rate.value))")
         }
     }
 }
