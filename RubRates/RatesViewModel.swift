@@ -15,11 +15,15 @@ final class RatesViewModel {
     private let provider: RatesProviding
     private let cache: CacheStore
     private let now: () -> Date
+    /// Вызывается после успешной загрузки и сохранения в кэш (например, чтобы обновить виджет).
+    private let onFreshData: () -> Void
 
-    init(provider: RatesProviding, cache: CacheStore = MemoryCacheStore(), now: @escaping () -> Date = Date.init) {
+    init(provider: RatesProviding, cache: CacheStore = MemoryCacheStore(), now: @escaping () -> Date = Date.init,
+         onFreshData: @escaping () -> Void = {}) {
         self.provider = provider
         self.cache = cache
         self.now = now
+        self.onFreshData = onFreshData
         if let cached = cache.load(CachedRates.self, key: CacheKey.rates) {
             snapshot = cached.snapshot
             lastUpdated = cached.fetchedAt
@@ -37,6 +41,7 @@ final class RatesViewModel {
             lastUpdated = fetchedAt
             refreshFailed = false
             cache.save(CachedRates(snapshot: fresh, fetchedAt: fetchedAt), key: CacheKey.rates)
+            onFreshData()
         } catch {
             refreshFailed = true
         }

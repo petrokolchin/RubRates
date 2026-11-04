@@ -134,6 +134,26 @@ struct RatesViewModelTests {
         await viewModel.load()
         #expect(viewModel.snapshot == snapshot)
     }
+
+    @Test func onFreshDataCalledAfterSuccessfulLoad() async {
+        let cache = MemoryCacheStore()
+        var cachedAtCall: RatesSnapshot?
+        var calls = 0
+        let viewModel = RatesViewModel(provider: FakeProvider([.success(snapshot)]), cache: cache, onFreshData: {
+            calls += 1
+            cachedAtCall = cache.load(CachedRates.self, key: CacheKey.rates)?.snapshot
+        })
+        await viewModel.load()
+        #expect(calls == 1)
+        #expect(cachedAtCall == snapshot)
+    }
+
+    @Test func onFreshDataNotCalledOnFailure() async {
+        var calls = 0
+        let viewModel = RatesViewModel(provider: FakeProvider([.failure(CBRError.badStatus(503))]), onFreshData: { calls += 1 })
+        await viewModel.load()
+        #expect(calls == 0)
+    }
 }
 
 /// Кэш, который ничего не сохраняет и ничего не отдаёт (как недоступная папка).
