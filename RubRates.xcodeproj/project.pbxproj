@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AC000000000000000000000C /* RubRatesWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AC0000000000000000000001 /* RubRatesWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		AB911825308B645F008FE15A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -14,11 +18,31 @@
 			remoteGlobalIDString = AB91180E308B63F8008FE15A;
 			remoteInfo = RubRates;
 		};
+		AC000000000000000000000E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB911807308B63F8008FE15A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC0000000000000000000004;
+			remoteInfo = RubRatesWidget;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AC000000000000000000000B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				AC000000000000000000000C /* RubRatesWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		AB91180F308B63F8008FE15A /* RubRates.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RubRates.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB911821308B645F008FE15A /* RubRatesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RubRatesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC0000000000000000000001 /* RubRatesWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RubRatesWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -30,6 +54,16 @@
 		AB911822308B645F008FE15A /* RubRatesTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = RubRatesTests;
+			sourceTree = "<group>";
+		};
+		AC0000000000000000000002 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		AC0000000000000000000003 /* RubRatesWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RubRatesWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -45,6 +79,11 @@
 			files = (
 			);
 		};
+		AC0000000000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -53,6 +92,8 @@
 			children = (
 				AB911811308B63F8008FE15A /* RubRates */,
 				AB911822308B645F008FE15A /* RubRatesTests */,
+				AC0000000000000000000002 /* Shared */,
+				AC0000000000000000000003 /* RubRatesWidget */,
 				AB911810308B63F8008FE15A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,6 +103,7 @@
 			children = (
 				AB91180F308B63F8008FE15A /* RubRates.app */,
 				AB911821308B645F008FE15A /* RubRatesTests.xctest */,
+				AC0000000000000000000001 /* RubRatesWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,11 +118,16 @@
 				AB91180B308B63F8008FE15A /* Sources */,
 				AB91180C308B63F8008FE15A /* Frameworks */,
 				AB91180D308B63F8008FE15A /* Resources */,
+				AC000000000000000000000B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
+			dependencies = (
+				AC000000000000000000000D /* PBXTargetDependency */,
+			);
 			fileSystemSynchronizedGroups = (
 				AB911811308B63F8008FE15A /* RubRates */,
+				AC0000000000000000000002 /* Shared */,
 			);
 			name = RubRates;
 			productName = RubRates;
@@ -108,6 +155,25 @@
 			productReference = AB911821308B645F008FE15A /* RubRatesTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		AC0000000000000000000004 /* RubRatesWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC0000000000000000000008 /* Build configuration list for PBXNativeTarget "RubRatesWidget" */;
+			buildPhases = (
+				AC0000000000000000000005 /* Sources */,
+				AC0000000000000000000006 /* Frameworks */,
+				AC0000000000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				AC0000000000000000000002 /* Shared */,
+				AC0000000000000000000003 /* RubRatesWidget */,
+			);
+			name = RubRatesWidget;
+			productName = RubRatesWidget;
+			productReference = AC0000000000000000000001 /* RubRatesWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -124,6 +190,9 @@
 					AB911820308B645F008FE15A = {
 						CreatedOnToolsVersion = 27.1;
 						TestTargetID = AB91180E308B63F8008FE15A;
+					};
+					AC0000000000000000000004 = {
+						CreatedOnToolsVersion = 27.1;
 					};
 				};
 			};
@@ -143,6 +212,7 @@
 			targets = (
 				AB91180E308B63F8008FE15A /* RubRates */,
 				AB911820308B645F008FE15A /* RubRatesTests */,
+				AC0000000000000000000004 /* RubRatesWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -154,6 +224,11 @@
 			);
 		};
 		AB91181F308B645F008FE15A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		AC0000000000000000000007 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -171,6 +246,11 @@
 			files = (
 			);
 		};
+		AC0000000000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -178,6 +258,11 @@
 			isa = PBXTargetDependency;
 			target = AB91180E308B63F8008FE15A /* RubRates */;
 			targetProxy = AB911825308B645F008FE15A /* PBXContainerItemProxy */;
+		};
+		AC000000000000000000000D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC0000000000000000000004 /* RubRatesWidget */;
+			targetProxy = AC000000000000000000000E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -306,6 +391,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/RubRates.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -337,6 +423,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/RubRates.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -403,6 +490,60 @@
 			};
 			name = Release;
 		};
+		AC0000000000000000000009 /* Debug configuration for PBXNativeTarget "RubRatesWidget" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/RubRatesWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/RubRatesWidget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = RubRates;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.RubRates.RubRatesWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AC000000000000000000000A /* Release configuration for PBXNativeTarget "RubRatesWidget" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/RubRatesWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/RubRatesWidget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = RubRates;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.RubRates.RubRatesWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -427,6 +568,14 @@
 			buildConfigurations = (
 				AB911828308B645F008FE15A /* Debug configuration for PBXNativeTarget "RubRatesTests" */,
 				AB911829308B645F008FE15A /* Release configuration for PBXNativeTarget "RubRatesTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		AC0000000000000000000008 /* Build configuration list for PBXNativeTarget "RubRatesWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC0000000000000000000009 /* Debug configuration for PBXNativeTarget "RubRatesWidget" */,
+				AC000000000000000000000A /* Release configuration for PBXNativeTarget "RubRatesWidget" */,
 			);
 			defaultConfigurationName = Release;
 		};
