@@ -11,6 +11,8 @@ struct RatesEntry: TimelineEntry {
 struct RatesProvider: TimelineProvider {
     /// Как часто просить систему обновить виджет: курс ЦБ меняется раз в день.
     static let refreshInterval: TimeInterval = 3 * 3600
+    /// У расширения мало времени: зависший запрос не должен лишить виджет кэша.
+    static let networkTimeout: TimeInterval = 10
 
     func placeholder(in context: Context) -> RatesEntry { Self.sampleEntry }
 
@@ -20,7 +22,7 @@ struct RatesProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<RatesEntry>) -> Void) {
         Task {
-            let loader = WidgetSnapshotLoader(cache: FileCacheStore.standard(), provider: CBRClient())
+            let loader = WidgetSnapshotLoader(cache: FileCacheStore.standard(), provider: CBRClient(timeout: Self.networkTimeout))
             let entry = Self.entry(snapshot: await loader.load())
             completion(Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(Self.refreshInterval))))
         }
@@ -54,6 +56,7 @@ struct RatesWidget: Widget {
         StaticConfiguration(kind: "RatesWidget", provider: RatesProvider()) { entry in
             RatesWidgetEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
+                .widgetURL(AppLink.ratesURL)
         }
         .configurationDisplayName("Курсы ЦБ")
         .description("Курсы валют из списка «Мои валюты».")

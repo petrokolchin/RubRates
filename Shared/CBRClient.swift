@@ -15,14 +15,18 @@ nonisolated struct CBRClient: RatesProviding {
     static let url = URL(string: "https://www.cbr-xml-daily.ru/daily_json.js")!
 
     private let session: URLSession
+    private let timeout: TimeInterval?
 
-    init(session: URLSession = .shared) {
+    /// `timeout` — тайм-аут запроса в секундах; `nil` оставляет системный (60 с). Виджету нужен короткий.
+    init(session: URLSession = .shared, timeout: TimeInterval? = nil) {
         self.session = session
+        self.timeout = timeout
     }
 
     func fetch() async throws -> RatesSnapshot {
         // Сервер разрешает кэшировать ответ на 2 часа; обновление должно ходить в сеть.
-        let request = URLRequest(url: Self.url, cachePolicy: .reloadIgnoringLocalCacheData)
+        var request = URLRequest(url: Self.url, cachePolicy: .reloadIgnoringLocalCacheData)
+        if let timeout { request.timeoutInterval = timeout }
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw CBRError.invalidResponse }
         guard http.statusCode == 200 else { throw CBRError.badStatus(http.statusCode) }

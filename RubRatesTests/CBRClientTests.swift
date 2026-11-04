@@ -65,6 +65,12 @@ struct CBRClientTests {
         #expect(StubURLProtocol.lastRequest?.cachePolicy == .reloadIgnoringLocalCacheData)
     }
 
+    @Test func fetchUsesGivenTimeout() async throws {
+        let client = CBRClient(session: StubURLProtocol.session(status: 200, body: Data(SampleResponses.daily.utf8)), timeout: 12)
+        _ = try await client.fetch()
+        #expect(StubURLProtocol.lastRequest?.timeoutInterval == 12)
+    }
+
     @Test func badStatusThrows() async {
         let client = CBRClient(session: StubURLProtocol.session(status: 503, body: Data()))
         await #expect(throws: CBRError.badStatus(503)) {
