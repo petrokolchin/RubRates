@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct RubRatesApp: App {
     @State private var viewModel: RatesViewModel
-    @State private var selection = CurrencySelection()
+    @State private var selection = CurrencySelection(legacyDefaults: .standard)
     private let history = CBRHistoryClient()
     private let cache: FileCacheStore
 

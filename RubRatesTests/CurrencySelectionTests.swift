@@ -120,4 +120,60 @@ struct CurrencySelectionTests {
         #expect(CurrencySelection.search(catalog, query: "   ").count == catalog.count)
         #expect(CurrencySelection.search(catalog, query: "нет такой") == [])
     }
+
+    // MARK: Общее хранилище и перенос
+
+    @Test func migratesLegacyWhenSharedEmpty() {
+        let shared = makeDefaults(), legacy = makeDefaults()
+        legacy.set(["GBP", "USD"], forKey: CurrencySelection.storageKey)
+        let selection = CurrencySelection(defaults: shared, legacyDefaults: legacy)
+        #expect(selection.codes == ["GBP", "USD"])
+        #expect(shared.stringArray(forKey: CurrencySelection.storageKey) == ["GBP", "USD"])
+    }
+
+    @Test func doesNotOverwriteSharedWithLegacy() {
+        let shared = makeDefaults(), legacy = makeDefaults()
+        shared.set(["EUR"], forKey: CurrencySelection.storageKey)
+        legacy.set(["GBP", "USD"], forKey: CurrencySelection.storageKey)
+        #expect(CurrencySelection(defaults: shared, legacyDefaults: legacy).codes == ["EUR"])
+        #expect(shared.stringArray(forKey: CurrencySelection.storageKey) == ["EUR"])
+    }
+
+    @Test func noLegacyAndNoSharedGivesDefaults() {
+        let selection = CurrencySelection(defaults: makeDefaults(), legacyDefaults: makeDefaults())
+        #expect(selection.codes == CurrencySelection.defaultCodes)
+    }
+
+    @Test func legacyJunkIsIgnored() {
+        let shared = makeDefaults(), legacy = makeDefaults()
+        legacy.set("junk", forKey: CurrencySelection.storageKey)
+        let selection = CurrencySelection(defaults: shared, legacyDefaults: legacy)
+        #expect(selection.codes == CurrencySelection.defaultCodes)
+        #expect(shared.object(forKey: CurrencySelection.storageKey) == nil)
+    }
+
+    @Test func savedCodesMatchesInitRules() {
+        let defaults = makeDefaults()
+        defaults.set(["USD", "EUR", "USD"], forKey: CurrencySelection.storageKey)
+        #expect(CurrencySelection.savedCodes(in: defaults) == ["USD", "EUR"])
+        defaults.set("junk", forKey: CurrencySelection.storageKey)
+        #expect(CurrencySelection.savedCodes(in: defaults) == CurrencySelection.defaultCodes)
+    }
+
+    @Test func staticRatesMatchesInstanceRates() {
+        let snapshot = RatesSnapshot(date: .now, rates: catalog)
+        #expect(CurrencySelection.rates(in: snapshot, codes: ["GBP", "XXX", "USD"]).map(\.code) == ["GBP", "USD"])
+        #expect(CurrencySelection.rates(in: snapshot, codes: ["XXX"]).map(\.code) == ["USD", "CNY", "EUR"])
+    }
+
+    @Test func onChangeFiresOnAddRemoveMove() {
+        let selection = CurrencySelection(defaults: makeDefaults())
+        var count = 0
+        selection.onChange = { count += 1 }
+        selection.add("GBP")
+        selection.add("GBP")
+        selection.remove("CNY")
+        selection.move(from: IndexSet(integer: 0), to: 2)
+        #expect(count == 3)
+    }
 }

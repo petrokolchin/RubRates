@@ -12,18 +12,29 @@ final class CurrencySelection {
 
     private(set) var codes: [String]
 
+    /// Вызывается после каждого сохранённого изменения (например, чтобы обновить виджет).
+    var onChange: (() -> Void)?
+
     private let defaults: UserDefaults
 
-    init(defaults: UserDefaults = .standard) {
+    /// `legacyDefaults` — прежнее место хранения (`.standard`): если в `defaults` выбора ещё нет,
+    /// а там он есть, выбор один раз копируется в `defaults`.
+    init(defaults: UserDefaults = AppGroup.sharedDefaults(), legacyDefaults: UserDefaults? = nil) {
         self.defaults = defaults
-        // Не массив строк или пустой массив считаем «не сохранено».
-        if let saved = defaults.stringArray(forKey: Self.storageKey), !saved.isEmpty {
-            // Дубли в повреждённых настройках убираем, сохраняя порядок первых вхождений.
-            var seen = Set<String>()
-            codes = saved.filter { seen.insert($0).inserted }
-        } else {
-            codes = Self.defaultCodes
+        if let legacyDefaults, defaults !== legacyDefaults,
+           defaults.object(forKey: Self.storageKey) == nil,
+           let legacy = legacyDefaults.stringArray(forKey: Self.storageKey), !legacy.isEmpty {
+            defaults.set(legacy, forKey: Self.storageKey)
         }
+        codes = Self.savedCodes(in: defaults)
+    }
+
+    /// Сохранённые коды; не массив строк или пустой массив считаем «не сохранено» и берём умолчание.
+    /// Дубли в повреждённых настройках убираем, сохраняя порядок первых вхождений.
+    nonisolated static func savedCodes(in defaults: UserDefaults) -> [String] {
+        guard let saved = defaults.stringArray(forKey: storageKey), !saved.isEmpty else { return defaultCodes }
+        var seen = Set<String>()
+        return saved.filter { seen.insert($0).inserted }
     }
 
     func add(_ code: String) {
@@ -45,13 +56,18 @@ final class CurrencySelection {
     }
 
     /// Курсы выбранных валют в выбранном порядке; кодов, которых нет в снимке, нет и в результате.
+    func rates(in snapshot: RatesSnapshot) -> [Rate] {
+        Self.rates(in: snapshot, codes: codes)
+    }
+
+    /// То же для заданных кодов (нужно виджету, у которого нет экземпляра на главном акторе).
     /// Если не нашлось ни одной выбранной валюты, показываем валюты по умолчанию, а если и их нет,
     /// первую из снимка: экран не должен остаться пустым. Сохранённый выбор при этом не меняется.
-    func rates(in snapshot: RatesSnapshot) -> [Rate] {
+    nonisolated static func rates(in snapshot: RatesSnapshot, codes: [String]) -> [Rate] {
         let byCode = Dictionary(snapshot.rates.map { ($0.code, $0) }, uniquingKeysWith: { first, _ in first })
         let selected = codes.compactMap { byCode[$0] }
         if !selected.isEmpty { return selected }
-        let defaults = Self.defaultCodes.compactMap { byCode[$0] }
+        let defaults = defaultCodes.compactMap { byCode[$0] }
         if !defaults.isEmpty { return defaults }
         return snapshot.rates.prefix(1).map { $0 }
     }
@@ -65,5 +81,6 @@ final class CurrencySelection {
 
     private func save() {
         defaults.set(codes, forKey: Self.storageKey)
+        onChange?()
     }
 }
