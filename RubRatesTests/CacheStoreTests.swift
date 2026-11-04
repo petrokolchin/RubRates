@@ -120,4 +120,21 @@ struct CacheStoreTests {
         #expect(CacheKey.history(cbrID: "R01235", period: .month) == "history-R01235-30")
         #expect(CacheKey.rates == "rates")
     }
+
+    @Test func standardUsesGroupDirectoryWhenAvailable() {
+        let directory = URL(filePath: "/tmp/group-dir/RubRatesCache")
+        #expect(FileCacheStore.standard(groupDirectory: directory).directory == directory)
+    }
+
+    @Test func standardFallsBackToCachesWithoutGroup() {
+        let directory = FileCacheStore.standard(groupDirectory: nil).directory
+        #expect(directory.path.hasSuffix("Caches/RubRatesCache"))
+    }
+
+    @Test func secondInstanceReadsWhatFirstWrote() {
+        withTempDirectory { directory in
+            FileCacheStore(directory: directory).save(rates, key: CacheKey.rates)
+            #expect(FileCacheStore(directory: directory).load(CachedRates.self, key: CacheKey.rates) == rates)
+        }
+    }
 }

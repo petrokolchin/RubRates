@@ -43,9 +43,14 @@ nonisolated struct FileCacheStore: CacheStore {
         self.directory = directory
     }
 
-    /// Папка `Caches/RubRatesCache` приложения: систему не пугает её очистка, данные восстановимы.
+    /// Папка кэша в контейнере App Group (её читает и виджет), а без группы `Caches/RubRatesCache`
+    /// приложения: систему не пугает её очистка, данные восстановимы.
     static func standard() -> FileCacheStore {
-        FileCacheStore(directory: URL.cachesDirectory.appending(path: "RubRatesCache"))
+        standard(groupDirectory: AppGroup.sharedCacheDirectory())
+    }
+
+    static func standard(groupDirectory: URL?) -> FileCacheStore {
+        FileCacheStore(directory: groupDirectory ?? URL.cachesDirectory.appending(path: "RubRatesCache"))
     }
 
     func load<T: Codable>(_ type: T.Type, key: String) -> T? {
