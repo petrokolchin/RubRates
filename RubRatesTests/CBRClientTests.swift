@@ -35,6 +35,18 @@ struct CBRClientTests {
         #expect(abs(jpy.value - 0.534) < 0.0001)
     }
 
+    @Test func skipsCurrencyWithZeroNominal() throws {
+        let snapshot = try CBRClient.parse(Data(SampleResponses.zeroNominal.utf8))
+        #expect(snapshot.rates.map(\.code) == ["EUR", "USD"])
+        #expect(snapshot.rates.allSatisfy { $0.value.isFinite && $0.previous.isFinite })
+    }
+
+    @Test func onlyZeroNominalThrows() {
+        #expect(throws: CBRError.invalidResponse) {
+            try CBRClient.parse(Data(SampleResponses.onlyZeroNominal.utf8))
+        }
+    }
+
     @Test func emptyValutesThrows() {
         #expect(throws: CBRError.invalidResponse) {
             try CBRClient.parse(Data(SampleResponses.emptyValutes.utf8))

@@ -82,8 +82,29 @@ struct CurrencySelectionTests {
         let snapshot = RatesSnapshot(date: .now, rates: catalog)
         #expect(CurrencySelection(defaults: defaults).rates(in: snapshot).map(\.code) == ["USD"])
 
+    }
+
+    @Test func duplicateSavedCodesAreDropped() {
+        let defaults = makeDefaults()
+        defaults.set(["USD", "EUR", "USD", "EUR", "GBP"], forKey: CurrencySelection.storageKey)
+        #expect(CurrencySelection(defaults: defaults).codes == ["USD", "EUR", "GBP"])
+    }
+
+    @Test func fallsBackToDefaultsWhenNoSelectedCodeIsAvailable() {
+        let defaults = makeDefaults()
         defaults.set(["XXX"], forKey: CurrencySelection.storageKey)
-        #expect(CurrencySelection(defaults: defaults).rates(in: snapshot) == [])
+        let snapshot = RatesSnapshot(date: .now, rates: catalog)
+        let selection = CurrencySelection(defaults: defaults)
+        #expect(selection.rates(in: snapshot).map(\.code) == ["USD", "CNY", "EUR"])
+        // Запасной список не перезаписывает сохранённый выбор.
+        #expect(selection.codes == ["XXX"])
+    }
+
+    @Test func fallsBackToFirstRateWhenDefaultsAreAlsoMissing() {
+        let defaults = makeDefaults()
+        defaults.set(["XXX"], forKey: CurrencySelection.storageKey)
+        let snapshot = RatesSnapshot(date: .now, rates: [rate("GBP", "Фунт стерлингов")])
+        #expect(CurrencySelection(defaults: defaults).rates(in: snapshot).map(\.code) == ["GBP"])
     }
 
     @Test func searchByCodeAndName() {

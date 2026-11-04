@@ -18,7 +18,9 @@ final class CurrencySelection {
         self.defaults = defaults
         // Не массив строк или пустой массив считаем «не сохранено».
         if let saved = defaults.stringArray(forKey: Self.storageKey), !saved.isEmpty {
-            codes = saved
+            // Дубли в повреждённых настройках убираем, сохраняя порядок первых вхождений.
+            var seen = Set<String>()
+            codes = saved.filter { seen.insert($0).inserted }
         } else {
             codes = Self.defaultCodes
         }
@@ -43,9 +45,15 @@ final class CurrencySelection {
     }
 
     /// Курсы выбранных валют в выбранном порядке; кодов, которых нет в снимке, нет и в результате.
+    /// Если не нашлось ни одной выбранной валюты, показываем валюты по умолчанию, а если и их нет,
+    /// первую из снимка: экран не должен остаться пустым. Сохранённый выбор при этом не меняется.
     func rates(in snapshot: RatesSnapshot) -> [Rate] {
         let byCode = Dictionary(snapshot.rates.map { ($0.code, $0) }, uniquingKeysWith: { first, _ in first })
-        return codes.compactMap { byCode[$0] }
+        let selected = codes.compactMap { byCode[$0] }
+        if !selected.isEmpty { return selected }
+        let defaults = Self.defaultCodes.compactMap { byCode[$0] }
+        if !defaults.isEmpty { return defaults }
+        return snapshot.rates.prefix(1).map { $0 }
     }
 
     /// Поиск по коду и названию без учёта регистра; пробелы по краям запроса не важны.

@@ -35,5 +35,16 @@ enum SampleResponses {
         eur,
     ])
 
+    /// Валюта с нулевым номиналом (повреждённый ответ) рядом с нормальными.
+    static let zeroNominal = response([
+        usd,
+        valute("JPY", "Японских иен", nominal: 0, value: 53.4, previous: 53.9),
+        eur,
+    ])
+
+    static let onlyZeroNominal = response([
+        valute("JPY", "Японских иен", nominal: 0, value: 53.4, previous: 53.9),
+    ])
+
     static let emptyValutes = response([])
 }

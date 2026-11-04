@@ -8,7 +8,6 @@ nonisolated protocol RatesProviding: Sendable {
 nonisolated enum CBRError: Error, Equatable {
     case badStatus(Int)
     case invalidResponse
-    case missingCurrency(String)
 }
 
 /// Единственное место с сетью: загружает курсы ЦБ РФ и разбирает JSON.
@@ -35,11 +34,12 @@ nonisolated struct CBRClient: RatesProviding {
         guard let date = ISO8601DateFormatter().date(from: body.date) else {
             throw CBRError.invalidResponse
         }
-        guard !body.valute.isEmpty else { throw CBRError.invalidResponse }
         // Порядок ключей JSON декодер не гарантирует, поэтому сортируем по коду: порядок стабилен.
-        let rates = body.valute.sorted { $0.key < $1.key }.map { code, v in
+        // Валюту с номиналом 0 или меньше пропускаем: деление на него дало бы бесконечность.
+        let rates = body.valute.filter { $0.value.nominal > 0 }.sorted { $0.key < $1.key }.map { code, v in
             Rate(code: code, cbrID: v.id, name: v.name, value: v.value, previous: v.previous, nominal: v.nominal)
         }
+        guard !rates.isEmpty else { throw CBRError.invalidResponse }
         return RatesSnapshot(date: date, rates: rates)
     }
 
