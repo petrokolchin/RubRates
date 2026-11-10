@@ -57,6 +57,9 @@ struct ConverterView: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.horizontal)
                         .padding(.vertical, 8)
+                        // Непрозрачная полоса: на низком экране (горизонтально) строки результата
+                        // уходят под неё и прокручиваются, а не просвечивают под кнопкой.
+                        .background(.bar)
                 }
             }
         } else {

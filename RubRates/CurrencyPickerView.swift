@@ -29,6 +29,8 @@ struct CurrencyPickerView: View {
                                 Spacer()
                                 Image(systemName: "plus.circle.fill").foregroundStyle(.green)
                             }
+                            // Без этого пустое место между текстом и плюсом не принимает нажатия.
+                            .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
